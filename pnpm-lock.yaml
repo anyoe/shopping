@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@orama/tokenizers':
+        specifier: ^3.1.18
+        version: 3.1.18
       '@supabase/supabase-js':
         specifier: ^2.94.1
         version: 2.94.1
@@ -21,6 +24,9 @@ importers:
       '@eslint/js':
         specifier: latest
         version: 9.39.2
+      '@orama/orama':
+        specifier: ^1.2.11
+        version: 1.2.11
       '@types/node':
         specifier: 25.2.0
         version: 25.2.0
@@ -769,6 +775,18 @@ packages:
 
   '@mdx-js/mdx@3.1.1':
     resolution: {integrity: sha512-f6ZO2ifpwAQIpzGWaBQT2TXxPv6z3RBzQKpVftEWN78Vl/YweF1uwussDx8ECAXVtr3Rs89fKyG9YlzUs9DyGQ==}
+
+  '@orama/orama@1.2.11':
+    resolution: {integrity: sha512-0yDcWgxOX0je18Z5dR64r4L3Jzm6bDNIpqM7qSu7H+9qhf6EsnlJbICrjt/oJ+WYnwiog4T0OXduVfLwAX+NVA==}
+    engines: {node: '>= 16.0.0'}
+
+  '@orama/orama@3.1.18':
+    resolution: {integrity: sha512-a61ljmRVVyG5MC/698C8/FfFDw5a8LOIvyOLW5fztgUXqUpc1jOfQzOitSCbge657OgXXThmY3Tk8fpiDb4UcA==}
+    engines: {node: '>= 20.0.0'}
+
+  '@orama/tokenizers@3.1.18':
+    resolution: {integrity: sha512-Ra4dFddWZ7hCGPAehnd/6QZjlzQvczYSt1y1Fq4HteJqRu2yvfR6fXvxiUnKi+HIgJYPxKhebJEjvJdF8LYQWg==}
+    engines: {node: '>= 20.0.0'}
 
   '@parcel/watcher-android-arm64@2.5.6':
     resolution: {integrity: sha512-YQxSS34tPF/6ZG7r/Ih9xy+kP/WwediEUsqmtf0cuCV5TPPKw/PQHRhueUo6JdeFJaqV3pyjm0GdYjZotbRt/A==}
@@ -3930,6 +3948,14 @@ snapshots:
       vfile: 6.0.3
     transitivePeerDependencies:
       - supports-color
+
+  '@orama/orama@1.2.11': {}
+
+  '@orama/orama@3.1.18': {}
+
+  '@orama/tokenizers@3.1.18':
+    dependencies:
+      '@orama/orama': 3.1.18
 
   '@parcel/watcher-android-arm64@2.5.6':
     optional: true

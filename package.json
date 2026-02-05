@@ -32,6 +32,7 @@
     "@builder.io/qwik": "^1.19.0",
     "@builder.io/qwik-city": "^1.19.0",
     "@eslint/js": "latest",
+    "@orama/orama": "^1.2.11",
     "@types/node": "25.2.0",
     "@vitest/ui": "^4.0.18",
     "compiled-i18n": "latest",
@@ -52,6 +53,7 @@
     "wrangler": "^4.62.0"
   },
   "dependencies": {
+    "@orama/tokenizers": "^3.1.18",
     "@supabase/supabase-js": "^2.94.1"
   }
 }
