@@ -2,6 +2,12 @@
   "locale": "zh_CN",
   "name": "zh (CN)",
   "translations": {
-    "Hi from Supbase": "来自Supbase的问候"
+    "Hi from Supbase": "来自Supbase的问候",
+    "Your email": "您的邮箱",
+    "Password": "密码",
+    "Sign up": "注册",
+    "Error": "错误",
+    "Success. Please check your email/spam folder": "注册成功。请检查您的邮箱/垃圾邮件文件夹",
+    "Sign in": "登录"
   }
 }
