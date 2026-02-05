@@ -1,5 +1,5 @@
 {
-  "name": "my-qwik-basic-starter",
+  "name": "anyoe-shopping",
   "description": "Demo app with sample routes",
   "engines": {
     "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
@@ -26,7 +26,8 @@
     "start": "vite --open --mode ssr",
     "test.unit": "vitest components",
     "test.unit.ui": "vitest --ui components",
-    "qwik": "qwik"
+    "qwik": "qwik",
+    "supabase": "supabase"
   },
   "devDependencies": {
     "@builder.io/qwik": "^1.19.0",
@@ -41,6 +42,7 @@
     "eslint-plugin-qwik": "^1.19.0",
     "globals": "17.3.0",
     "prettier": "3.8.1",
+    "supabase-auth-helpers-qwik": "^0.0.3",
     "typescript": "5.9.3",
     "typescript-eslint": "8.54.0",
     "typescript-plugin-css-modules": "latest",
@@ -48,8 +50,7 @@
     "vite": "7.3.1",
     "vite-tsconfig-paths": "^6.0.5",
     "vitest": "^4.0.18",
-    "wrangler": "^4.62.0",
-    "supabase-auth-helpers-qwik": "^0.0.3"
+    "wrangler": "^4.62.0"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.94.1"

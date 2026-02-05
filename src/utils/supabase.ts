@@ -1,4 +1,4 @@
-import { createServerClient } from 'supabase-auth-helpers-qwik'
+import { createServerClient } from 'supabase-auth-helpers-qwik';
 import type { RequestEventBase } from '@builder.io/qwik-city';
 
 const viteUrl = import.meta.env.VITE_SUPABASE_URL;
