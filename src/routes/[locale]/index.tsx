@@ -4,18 +4,9 @@ import { createClient } from '~/utils/supabase';
 import { _, getLocale } from 'compiled-i18n';
 
 export const useUser = routeLoader$(async (event) => {
-    const supabaseAccessToken = event.cookie.get(
-        'supabase_auth_token'
-    );
-    if (!supabaseAccessToken) {
-        return null;
-    }
     const supabase = createClient(event);
-    const { data, error } = await supabase.auth.getUser(
-        supabaseAccessToken.value
-    )
-
-    return error ? null : data.user;
+    const { data: { user } } = await supabase.auth.getUser();
+    return user;
 });
 
 type Product = {
