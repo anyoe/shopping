@@ -5,8 +5,8 @@ import { _, getLocale } from 'compiled-i18n';
 
 export const useUser = routeLoader$(async (event) => {
     const supabase = createClient(event);
-    const { data: { user } } = await supabase.auth.getUser();
-    return user;
+    const { data, error } = await supabase.auth.getUser();
+    return error ? null : data.user;
 });
 
 type Product = {
@@ -35,8 +35,6 @@ export default component$(() => {
     const userSig = useUser();
     const productsSig = useProducts();
     const navigate = useNavigate();
-
-    console.log(userSig.value);
 
     const { code, factor } = currencyMap[locale] || currencyMap['en_US'];
 
