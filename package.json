@@ -26,8 +26,7 @@
     "start": "vite --open --mode ssr",
     "test.unit": "vitest components",
     "test.unit.ui": "vitest --ui components",
-    "qwik": "qwik",
-    "supabase": "supabase"
+    "qwik": "qwik"
   },
   "devDependencies": {
     "@builder.io/qwik": "^1.19.0",
