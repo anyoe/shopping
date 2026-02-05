@@ -9,7 +9,7 @@ export const useSignInAction = routeAction$(
         const email = form.email.toString();
         const password = form.password.toString();
 
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
         });
@@ -19,6 +19,15 @@ export const useSignInAction = routeAction$(
                 success: false,
                 message: error.message
             };
+        }
+
+        if (data.session) {
+            event.cookie.set('supabase_auth_token', data.session.access_token, {
+                path: '/',
+                httpOnly: true,
+                sameSite: 'lax',
+                secure: true,
+            });
         }
 
         throw event.redirect(303, `/${event.params.locale}/`);

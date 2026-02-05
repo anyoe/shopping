@@ -4,9 +4,18 @@ import { createClient } from '~/utils/supabase';
 import { _, getLocale } from 'compiled-i18n';
 
 export const useUser = routeLoader$(async (event) => {
+    const supabaseAccessToken = event.cookie.get(
+        'supabase_auth_token'
+    );
+    if (!supabaseAccessToken) {
+        return null;
+    }
     const supabase = createClient(event);
-    const { data: { user } } = await supabase.auth.getUser();
-    return user;
+    const { data, error } = await supabase.auth.getUser(
+        supabaseAccessToken.value
+    )
+
+    return error ? null : data.user;
 });
 
 type Product = {
@@ -35,6 +44,8 @@ export default component$(() => {
     const userSig = useUser();
     const productsSig = useProducts();
     const navigate = useNavigate();
+
+    console.log(userSig.value);
 
     const { code, factor } = currencyMap[locale] || currencyMap['en_US'];
 
@@ -75,7 +86,7 @@ export default component$(() => {
                                         <button
                                             type='button'
                                             class='sign-in-btn'
-                                            onClick$={() => navigate('/sign-in')}
+                                            onClick$={() => navigate(`/${locale}/sign-in`)}
                                         >
                                             {_`Sign in`}
                                         </button>
