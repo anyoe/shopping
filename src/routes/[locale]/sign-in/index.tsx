@@ -1,27 +1,27 @@
 import { component$ } from "@builder.io/qwik";
 import { Form, routeAction$, zod$, z } from "@builder.io/qwik-city";
-import { supabaseClient } from "~/utils/supabase";
+import { createClient } from '~/utils/supabase';
 import { _ } from 'compiled-i18n'
 
 export const useSignInAction = routeAction$(
     async (form, event) => {
+        const supabase = createClient(event);
         const email = form.email.toString();
         const password = form.password.toString();
-        const { data } = await supabaseClient.auth.signInWithPassword({
+
+        const { error } = await supabase.auth.signInWithPassword({
             email,
             password,
         });
-        if (data.session) {
-            event.cookie.set(
-                'supabase_access_token',
-                data.session.access_token,
-                {
-                    path: '/'
-                }
-            )
-            throw event.redirect(303, '/');
+
+        if (error) {
+            return {
+                success: false,
+                message: error.message
+            };
         }
-        return { success: false };
+
+        throw event.redirect(303, `/${event.params.locale}/`);
     },
     zod$({
         email: z.string().email(),

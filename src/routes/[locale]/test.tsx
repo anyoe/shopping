@@ -1,6 +1,6 @@
 import { component$ } from '@builder.io/qwik';
 import { routeLoader$ } from '@builder.io/qwik-city';
-import { createServerClient } from 'supabase-auth-helpers-qwik'
+import { createClient } from '~/utils/supabase';
 import { _ } from 'compiled-i18n';
 
 type TestRow = {
@@ -9,19 +9,11 @@ type TestRow = {
   test_column: string;
 };
 
+
 export const useTestTable = routeLoader$(
   async (event) => {
-    const url = import.meta.env.VITE_SUPABASE_URL;
-    const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-    const supbaseClient = createServerClient(
-      url,
-      anonKey,
-      event
-    );
-
+    const supbaseClient = createClient(event);
     const { data } = await supbaseClient.from('test').select('*');
-
     return data as TestRow[];
   }
 )
