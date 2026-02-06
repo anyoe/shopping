@@ -1,4 +1,4 @@
-import { component$, useSignal } from "@builder.io/qwik";
+import { component$, useSignal, useTask$ } from "@builder.io/qwik";
 import { routeLoader$, server$, useNavigate, useLocation } from "@builder.io/qwik-city";
 import { createClient } from "~/utils/supabase";
 import type { PostgrestSingleResponse } from "@supabase/supabase-js";
@@ -89,15 +89,21 @@ export default component$(() => {
     const userSig = useUser();
     const navigate = useNavigate();
     const loc = useLocation();
-    const productDetailLoader = useSignal(useProductDetail().value);
+    const productDetail = useProductDetail();
     const locale = getLocale();
 
-    if (!productDetailLoader.value.product) {
+    if (!productDetail.value.product) {
         return <div>{_`Sorry, looks like we don't have this product`}</div>
     }
 
-    const product = productDetailLoader.value.product;
-    const isFavorite = productDetailLoader.value.isFavorite;
+    const product = productDetail.value.product;
+    const isFavoriteSig = useSignal(productDetail.value.isFavorite);
+
+    // Sync signal with loader when data refreshes
+    useTask$(({ track }) => {
+        track(() => productDetail.value.isFavorite);
+        isFavoriteSig.value = productDetail.value.isFavorite;
+    });
 
     return (
         <div class="full-width-container" style={{ padding: '2rem 1rem' }}>
@@ -147,22 +153,15 @@ export default component$(() => {
                                     style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem' }}
                                     onClick$={async () => {
                                         if (userSig.value) {
-                                            const newFavoriteStatus = !isFavorite;
-                                            await changeFavorite(Number(product.id), newFavoriteStatus);
-                                            // Trigger a re-run of the route loaders to update UI
-                                            // or we could use another signal if we wanted pure client-side update
-                                            // However, for simplicity and ensuring sync with DB, re-fetching is fine 
-                                            // or manually updating the signal if we had one.
-                                            // Given we use the loader directly now, we might need a local signal or navigate(loc.url.href)
+                                            const nextValue = !isFavoriteSig.value;
+                                            isFavoriteSig.value = nextValue; // Optimistic update
+                                            await changeFavorite(Number(product.id), nextValue);
+                                            // Refresh loader in background to sync with DB
                                             navigate(loc.url.href);
-                                        }
-                                        productDetailLoader.value = {
-                                            ...productDetailLoader.value,
-                                            isFavorite: !isFavorite
                                         }
                                     }}
                                 >
-                                    <HeartIcon active={isFavorite} />
+                                    <HeartIcon active={isFavoriteSig.value} />
                                     <span style={{ fontWeight: '500', color: '#374151' }}>{_`Add to favorites`}</span>
                                 </button>
                             </div>
