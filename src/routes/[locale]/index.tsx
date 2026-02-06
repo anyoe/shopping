@@ -4,6 +4,7 @@ import { createClient } from '~/utils/supabase';
 import { _, getLocale } from 'compiled-i18n';
 import { create, insert, search, type AnyOrama } from '@orama/orama';
 import { createTokenizer } from '@orama/tokenizers/mandarin';
+import { HeartIcon } from '~/components/HeartIcon';
 
 export const useUser = routeLoader$(async (event) => {
     const supabase = createClient(event);
@@ -11,20 +12,22 @@ export const useUser = routeLoader$(async (event) => {
     return error ? null : data.user;
 });
 
-type Product = {
+export type Product = {
     id: string;
     name: Record<string, string>;
     description: Record<string, string>;
     price: Record<string, number>;
     image: string;
+    slug: Record<string, string>;
 };
 
-type ProductDocument = {
+export type ProductDocument = {
     id: string;
     name: string;
     description: string;
     price: number;
     image: string;
+    slug: string;
 }
 
 let oramaDb: AnyOrama;
@@ -69,6 +72,7 @@ export const useProducts = routeLoader$(async (event) => {
                 description: product.description[locale],
                 price: product.price[code],
                 image: product.image,
+                slug: product.slug['en_US']
             }
             products.push(productDocument);
             await insert(oramaDb, productDocument);
@@ -152,6 +156,7 @@ export default component$(() => {
                                     class="product-image"
                                     src={`/images/${product.image}`}
                                     alt={product.name}
+                                    onClick$={() => navigate(`/${locale}/detail/${product.slug}`)}
                                 />
                             </div>
                             <div class='product-info'>
@@ -176,6 +181,9 @@ export default component$(() => {
                                             {_`Sign in`}
                                         </button>
                                     )}
+                                    <button type='button'>
+                                        <HeartIcon />
+                                    </button>
                                 </div>
                             </div>
                         </div>
