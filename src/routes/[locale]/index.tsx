@@ -30,7 +30,7 @@ type ProductDocument = {
 let oramaDb: AnyOrama;
 
 export const useProducts = routeLoader$(async (event) => {
-    const locale = getLocale();
+    const locale = event.locale();
     const { code } = currencyMap[locale] || currencyMap['en_US'];
     const supabase = createClient(event);
     const { data } = await supabase.from('products').select('*');
@@ -84,14 +84,14 @@ const currencyMap: Record<string, { code: string; factor: number }> = {
 };
 
 
-export const execSearch = server$(async (term: string) => {
+export const execSearch = server$(async (term: string, locale: string) => {
     const response = await search(oramaDb, {
         term,
         properties: '*',
         boost: {
             name: 1.5
         },
-        tolerance: 2
+        tolerance: locale === 'zh_CN' ? 0 : 2
     });
 
     return response;
@@ -115,7 +115,7 @@ export default component$(() => {
             return;
         }
 
-        const response = await execSearch(term);
+        const response = await execSearch(term, locale);
         resultSig.value = response.hits.map(
             (hit) => hit.document as unknown as ProductDocument
         );
