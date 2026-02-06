@@ -1,7 +1,9 @@
-import { routeLoader$, useNavigate } from '@builder.io/qwik-city';
-import { component$ } from '@builder.io/qwik';
+import { routeLoader$, useNavigate, server$ } from '@builder.io/qwik-city';
+import { component$, useSignal, $ } from '@builder.io/qwik';
 import { createClient } from '~/utils/supabase';
 import { _, getLocale } from 'compiled-i18n';
+import { create, insert, search, type AnyOrama } from '@orama/orama';
+import { createTokenizer } from '@orama/tokenizers/mandarin';
 
 export const useUser = routeLoader$(async (event) => {
     const supabase = createClient(event);
@@ -17,10 +19,63 @@ type Product = {
     image: string;
 };
 
+type ProductDocument = {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    image: string;
+}
+
+let oramaDb: AnyOrama;
+
 export const useProducts = routeLoader$(async (event) => {
+    const locale = getLocale();
+    const { code } = currencyMap[locale] || currencyMap['en_US'];
     const supabase = createClient(event);
     const { data } = await supabase.from('products').select('*');
-    return data as Product[];
+    const products: ProductDocument[] = [];
+
+    if (locale === 'zh_CN') {
+        oramaDb = await create({
+            schema: {
+                id: 'string',
+                name: 'string',
+                description: 'string',
+                price: 'number',
+                image: 'string',
+            },
+            components: {
+                tokenizer: await createTokenizer(),
+            }
+        })
+    } else {
+        oramaDb = await create({
+            schema: {
+                id: 'string',
+                name: 'string',
+                description: 'string',
+                price: 'number',
+                image: 'string',
+            },
+        })
+    }
+
+    if (data) {
+        for (const product of data) {
+            const productDocument = {
+                id: product.id.toString(),
+                name: product.name[locale],
+                description: product.description[locale],
+                price: product.price[code],
+                image: product.image,
+            }
+            products.push(productDocument);
+            await insert(oramaDb, productDocument);
+        }
+    }
+
+    return products;
 });
 
 const currencyMap: Record<string, { code: string; factor: number }> = {
@@ -28,21 +83,62 @@ const currencyMap: Record<string, { code: string; factor: number }> = {
     'zh_CN': { code: 'CNY', factor: 100 },
 };
 
+
+export const execSearch = server$(async (term: string) => {
+    const response = await search(oramaDb, {
+        term,
+        properties: '*',
+        boost: {
+            name: 1.5
+        },
+        tolerance: 2
+    });
+
+    return response;
+});
+
 export default component$(() => {
     const locale = getLocale();
     const localeIntl = locale.replace('_', '-');
 
+    const termSig = useSignal('');
     const userSig = useUser();
     const productsSig = useProducts();
     const navigate = useNavigate();
+    const resultSig = useSignal<ProductDocument[]>(productsSig.value);
 
     const { code, factor } = currencyMap[locale] || currencyMap['en_US'];
 
+    const onSearch = $(async (term: string) => {
+        if (term === '') {
+            resultSig.value = productsSig.value;
+            return;
+        }
+
+        const response = await execSearch(term);
+        resultSig.value = response.hits.map(
+            (hit) => hit.document as unknown as ProductDocument
+        );
+    })
+
     return (
         <div class='full-width-container'>
+            <label class='search-label'>
+                {_`Search`}
+            </label>
+            <input
+                type='text'
+                class='search-input'
+                bind:value={termSig}
+                onKeyDown$={(e) => {
+                    if (e.key === 'Enter') {
+                        onSearch(termSig.value);
+                    }
+                }}
+            />
             <div class='product-grid'>
-                {productsSig.value.map((product) => {
-                    const amount = (product.price[code] || product.price['USD']) / factor;
+                {resultSig.value.map((product) => {
+                    const amount = product.price / factor;
                     const formattedPrice = new Intl.NumberFormat(localeIntl, {
                         style: 'currency',
                         currency: code
@@ -55,12 +151,12 @@ export default component$(() => {
                                     loading="eager"
                                     class="product-image"
                                     src={`/images/${product.image}`}
-                                    alt={product.name[locale] || product.name['en_US']}
+                                    alt={product.name}
                                 />
                             </div>
                             <div class='product-info'>
-                                <span class='product-name'>{product.name[locale] || product.name['en_US']}</span>
-                                <div class='product-description'>{product.description[locale] || product.description['en_US']}</div>
+                                <span class='product-name'>{product.name}</span>
+                                <div class='product-description'>{product.description}</div>
                                 <div class='product-footer'>
                                     <span class='product-price'>{formattedPrice}</span>
                                     {userSig.value ? (

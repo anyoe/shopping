@@ -2,6 +2,12 @@
   "locale": "en_US",
   "name": "en (US)",
   "translations": {
-    "Hi from Supbase": "Hi from Supbase"
+    "Hi from Supbase": "Hi from Supbase",
+    "Your email": "",
+    "Password": "",
+    "Sign in": "",
+    "Sign up": "",
+    "Add to cart!": "",
+    "Add to Cart": ""
   }
 }
