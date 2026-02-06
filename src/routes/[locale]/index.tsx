@@ -5,12 +5,7 @@ import { _, getLocale } from 'compiled-i18n';
 import { create, insert, search, type AnyOrama } from '@orama/orama';
 import { createTokenizer } from '@orama/tokenizers/mandarin';
 import { HeartIcon } from '~/components/HeartIcon';
-
-export const useUser = routeLoader$(async (event) => {
-    const supabase = createClient(event);
-    const { data, error } = await supabase.auth.getUser();
-    return error ? null : data.user;
-});
+import { useUser } from './layout';
 
 export type Product = {
     id: string;
