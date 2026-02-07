@@ -1,4 +1,4 @@
-import { routeLoader$, useNavigate, server$, RequestHandler } from '@builder.io/qwik-city';
+import { routeLoader$, useNavigate, server$ } from '@builder.io/qwik-city';
 import { component$, useSignal, $ } from '@builder.io/qwik';
 import { createClient } from '~/utils/supabase';
 import { _, getLocale } from 'compiled-i18n';
@@ -188,11 +188,3 @@ export default component$(() => {
         </div>
     )
 });
-
-export const onGet: RequestHandler = async ({ cacheControl }) => {
-    cacheControl({
-        maxAge: 60,
-        sMaxAge: 60,
-        staleWhileRevalidate: 120
-    })
-};
